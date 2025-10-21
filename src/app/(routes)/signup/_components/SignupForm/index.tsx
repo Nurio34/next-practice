@@ -3,6 +3,7 @@
 import { FormEvent, useState } from "react";
 import { signup } from "../../_actions/signup";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 function SignupForm() {
   const [isLoading, setIsLoading] = useState(false);
@@ -57,6 +58,12 @@ function SignupForm() {
           <span>Signup</span>
         )}
       </button>
+      <Link
+        href={"/login"}
+        className="text-primary font-semibold text-sm justify-self-end"
+      >
+        Login
+      </Link>
     </form>
   );
 }

@@ -1,9 +1,9 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
-import { cookies } from "next/headers";
+import { hash } from "@/util/bcrypt";
+import { handleCookies } from "@/util/handleCookies";
+import { createToken } from "@/util/jwt";
 
 export const signup = async (
   data: FormData
@@ -27,30 +27,19 @@ export const signup = async (
       return { status: "fail", msg: "Email already exist!" };
 
     //! hash password
-    const salt = bcrypt.genSaltSync(10);
-    const hash = bcrypt.hashSync(password, salt);
+    const hashPassword = hash(password);
 
     //! create user
-    const user = await prisma.user.create({ data: { email, password: hash } });
-    const { id, email: userEmail, createdAt } = user;
+    const user = await prisma.user.create({
+      data: { email, password: hashPassword },
+    });
+    const { id, email: userEmail, createdAt, role } = user;
 
     //! create token
-    const token = jwt.sign(
-      { id, email: userEmail, createdAt },
-      process.env.JWT_SECRET!,
-      { expiresIn: "1h" }
-    );
+    const token = createToken(id, userEmail, createdAt, role);
 
     //! set cookies
-    (await cookies()).set({
-      name: "token",
-      value: token,
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-      path: "/",
-      maxAge: 60 * 60, // 1 hour
-    });
+    await handleCookies(token);
 
     return { status: "success", msg: "Success Signup" };
   } catch (error) {
