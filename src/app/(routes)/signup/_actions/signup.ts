@@ -6,7 +6,8 @@ import { handleCookies } from "@/util/handleCookies";
 import { createToken } from "@/util/jwt";
 
 export const signup = async (
-  data: FormData
+  data: FormData,
+  ip: string
 ): Promise<{ status: "success" | "fail"; msg: string }> => {
   const email = data.get("email") as string;
   const password = data.get("password") as string;
@@ -17,6 +18,9 @@ export const signup = async (
 
   if (password !== confirmPassword)
     return { status: "fail", msg: "Passwords dont match" };
+
+  if (!ip || ip.trim() === "")
+    return { status: "fail", msg: "No ip detected !" };
 
   try {
     //! check if same email in db
@@ -33,10 +37,14 @@ export const signup = async (
     const user = await prisma.user.create({
       data: { email, password: hashPassword },
     });
+    const userIP = await prisma.userIP.create({
+      data: { userId: user.id, ip },
+    });
     const { id, email: userEmail, createdAt, role } = user;
+    const { ip: savedIp } = userIP;
 
     //! create token
-    const token = createToken(id, userEmail, createdAt, role);
+    const token = createToken(id, userEmail, createdAt, role, savedIp);
 
     //! set cookies
     await handleCookies(token);

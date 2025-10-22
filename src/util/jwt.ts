@@ -6,10 +6,11 @@ export const createToken = (
   id: string,
   email: string,
   createdAt: Date,
-  role: $Enums.Role
+  role: $Enums.Role,
+  ip: string
 ): string => {
   const token = jwt.sign(
-    { id, email, createdAt, role },
+    { id, email, createdAt, role, ip },
     process.env.JWT_SECRET!,
     {
       expiresIn: "1h",

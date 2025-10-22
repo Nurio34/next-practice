@@ -6,7 +6,8 @@ import { handleCookies } from "@/util/handleCookies";
 import { createToken } from "@/util/jwt";
 
 export const login = async (
-  data: FormData
+  data: FormData,
+  ip: string
 ): Promise<{ status: "success" | "fail"; msg: string }> => {
   const email = data.get("email") as string;
   const password = data.get("password") as string;
@@ -16,7 +17,10 @@ export const login = async (
 
   try {
     //! check if existing user
-    const user = await prisma.user.findUnique({ where: { email } });
+    const user = await prisma.user.findUnique({
+      where: { email },
+      include: { ips: true },
+    });
     if (!user) return { status: "fail", msg: "No user with this email" };
 
     //! check if password true
@@ -30,8 +34,14 @@ export const login = async (
     const isPasswordTrue = check(password, hashedPassword);
     if (!isPasswordTrue) return { status: "fail", msg: "Wrong password" };
 
+    //! check if the ip in ips
+    const { ips } = user;
+    const isIpInIps = ips.some((savedIp) => savedIp.ip === ip);
+    if (!isIpInIps) return { status: "fail", msg: "Unknown ip usage detected" };
+    console.log({ isIpInIps });
+
     //! create token
-    const token = createToken(id, userEmail, createdAt, role);
+    const token = createToken(id, userEmail, createdAt, role, ip);
 
     //! set cookies
     await handleCookies(token);

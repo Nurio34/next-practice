@@ -3,7 +3,7 @@ import { verifyToken } from "@/util/jwt";
 import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
-  const token = request.headers.get("authentication")?.split(" ")[1];
+  const token = request.headers.get("Authorization")?.split(" ")[1];
   if (!token) return NextResponse.json({ isUserReal: false }, { status: 400 });
 
   try {

@@ -9,13 +9,21 @@ function SignupForm() {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
+  const getIp = async () => {
+    const res = await fetch("/api/getIp");
+    const { ip } = await res.json();
+    return ip as string;
+  };
+
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget); // ✅ gets all inputs from the form
 
     try {
       setIsLoading(true);
-      const { status, msg } = await signup(formData);
+      const ip = await getIp();
+
+      const { status, msg } = await signup(formData, ip);
       if (status === "success") {
         console.log(msg);
         router.push("/home");
@@ -35,18 +43,26 @@ function SignupForm() {
       className="min-w-96 border-2 grid gap-y-2  py-4 pl-2 pr-8"
     >
       <h1 className="justify-self-center text-xl font-bold">Signup</h1>
-      <input type="email" name="email" id="email" placeholder="Email" />
+      <input
+        type="email"
+        name="email"
+        id="email"
+        placeholder="Email"
+        defaultValue={"nurioonsoftware@gmail.com"}
+      />
       <input
         type="password"
         name="password"
         id="password"
         placeholder="Password"
+        defaultValue={"12"}
       />
       <input
         type="password"
         name="confirmPassword"
         id="confirmPassword"
         placeholder="Confirm Password"
+        defaultValue={"12"}
       />
       <button type="submit" className="btn btn-primary">
         {isLoading ? (

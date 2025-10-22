@@ -7,23 +7,34 @@ import { login } from "../../_actions/login";
 
 function LoginForm() {
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+
+  const getIp = async () => {
+    const res = await fetch("/api/getIp");
+    const { ip } = await res.json();
+    return ip as string;
+  };
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const formData = new FormData(e.currentTarget); // ✅ gets all inputs from the form
+    const formData = new FormData(e.currentTarget);
 
     try {
+      setError(null);
       setIsLoading(true);
-      const { status, msg } = await login(formData);
+      const ip = await getIp();
+
+      const { status, msg } = await login(formData, ip);
       if (status === "success") {
         console.log(msg);
         router.push("/home");
       } else {
-        console.error(msg);
+        setError(msg);
       }
     } catch (error) {
       console.error(error);
+      setError("handleSubmit Internal Error !");
     } finally {
       setIsLoading(false);
     }
@@ -65,6 +76,7 @@ function LoginForm() {
       >
         Signup
       </Link>
+      <p className="text-error text-sm font-bold">{error}</p>
     </form>
   );
 }
