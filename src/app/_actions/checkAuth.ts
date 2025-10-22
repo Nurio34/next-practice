@@ -13,7 +13,7 @@ export const checkAuth = async () => {
     //! verify token
     const { status, decoded } = await verifyToken(token);
 
-    if (status === "invalid" || decoded.trim() === "") redirect("/");
+    if (status === "invalid" || !decoded) redirect("/");
   } catch (error) {
     console.error(error);
     redirect("/");

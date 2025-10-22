@@ -23,7 +23,7 @@ function LoginForm() {
         console.error(msg);
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
     } finally {
       setIsLoading(false);
     }

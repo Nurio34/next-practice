@@ -1,4 +1,5 @@
 import { $Enums } from "@/generated/prisma";
+import { JWTPayload } from "jose";
 import jwt, { JwtPayload } from "jsonwebtoken";
 
 export const createToken = (
@@ -22,14 +23,14 @@ export const verifyToken = async (
   token: string
 ): Promise<{
   status: "valid" | "invalid";
-  decoded: string | JwtPayload;
+  decoded: null | JwtPayload;
 }> => {
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET!);
 
-    return { status: "valid", decoded };
+    return { status: "valid", decoded: decoded as JWTPayload };
   } catch (error) {
     console.error(error);
-    return { status: "invalid", decoded: "" };
+    return { status: "invalid", decoded: null };
   }
 };
