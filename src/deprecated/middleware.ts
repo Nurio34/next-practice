@@ -19,6 +19,8 @@ const unauthRoutes = ["/", "/signup", "/login"];
 const protectedRoutes = ["/home"];
 
 export async function middleware(request: NextRequest) {
+  console.log("middleware working...");
+
   const path = request.nextUrl.pathname;
 
   try {

@@ -20,8 +20,15 @@ model User {
   password  String
   ips       UserIP[]
   role      Role     @default(user)
+  todos     Todo[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+enum Role {
+  user 
+  seller
 }
 
 model UserIP {
@@ -32,8 +39,15 @@ model UserIP {
   createdAt DateTime @default(now())
 }
 
+model Todo {
+  id        String   @id @default(uuid())
+  todo      String
+  userId    String
+  user      User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-enum Role {
-  user 
-  seller
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
+
+
+
