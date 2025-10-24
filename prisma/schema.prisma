@@ -42,11 +42,18 @@ model UserIP {
 model Todo {
   id        String   @id @default(uuid())
   todo      String
+  category  Category
   userId    String
   user      User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+enum Category {
+  shop
+  hobby
+  social
 }
 
 

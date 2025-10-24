@@ -1,30 +1,36 @@
 "use server";
 
+import { authUser } from "@/app/_actions/authUser";
+import { Category } from "@/generated/prisma";
 import { prisma } from "@/lib/prisma";
-import { verifyToken } from "@/util/jwt";
 import { updateTag } from "next/cache";
-import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 
-export const addTodo = async (data: FormData) => {
+export const addTodo = async (data: FormData): Promise<void> => {
   const todo = data.get("todo") as string;
+  const category = data.get("category") as Category;
+  if (todo.trim() === "" || category.trim() === "")
+    return console.error("Invalid todo");
 
   try {
-    const token = (await cookies()).get("token")?.value;
-    if (!token) return console.error("Unauthenticated action");
+    const { status, msg, authedUser } = await authUser();
+    if (status === "fail" || !authedUser) {
+      console.error(msg);
+      redirect("/signup");
+    }
 
-    const { status, decoded } = await verifyToken(token);
-    if (status === "invalid" || !decoded)
-      return console.error("Mallformed token");
-
-    const { id, email, role, createdAt } = decoded;
     const user = await prisma.user.findUnique({
-      where: { id, email, role, createdAt },
+      where: authedUser,
     });
     if (!user) return console.error("Unexisting user");
 
-    const newTodo = await prisma.todo.create({ data: { todo, userId: id } });
+    const newTodo = await prisma.todo.create({
+      data: { todo, userId: user.id, category },
+    });
     updateTag("todos");
+    return console.log("Success addTodo");
   } catch (error) {
     console.error(error);
+    return console.error("Server error at addTodo");
   }
 };

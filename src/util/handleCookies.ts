@@ -9,7 +9,7 @@ export const handleCookies = async (token: string) => {
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
       path: "/",
-      maxAge: 60 * 60, // 1 hour
+      maxAge: 10, // 1 hour
     });
   } catch (error) {
     console.error(error);

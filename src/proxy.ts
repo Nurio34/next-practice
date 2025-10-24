@@ -8,11 +8,12 @@ export default async function proxy(request: NextRequest) {
   const token = (await cookies()).get("token")?.value;
   const route = request.nextUrl.pathname;
 
-  if (unprotectedRoutes.includes(route)) {
-    if (token) return NextResponse.redirect(new URL("/home", request.url));
-  } else if (protectedRoutes.includes(route)) {
-    if (!token) return NextResponse.redirect(new URL("/signup", request.url));
-  }
+  // if (protectedRoutes.includes(route)) {
+  //   if (!token) return NextResponse.redirect(new URL("/signup", request.url));
+  // }
+  // if (unprotectedRoutes.includes(route)) {
+  //   if (token) return NextResponse.redirect(new URL("/home", request.url));
+  // }
 
   //   return NextResponse.redirect(new URL("/home", request.url));
 }

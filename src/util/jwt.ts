@@ -13,7 +13,7 @@ export const createToken = (
     { id, email, createdAt, role, ip },
     process.env.JWT_SECRET!,
     {
-      expiresIn: "1h",
+      expiresIn: "10s",
     }
   );
 

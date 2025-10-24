@@ -38,7 +38,6 @@ export const login = async (
     const { ips } = user;
     const isIpInIps = ips.some((savedIp) => savedIp.ip === ip);
     if (!isIpInIps) return { status: "fail", msg: "Unknown ip usage detected" };
-    console.log({ isIpInIps });
 
     //! create token
     const token = createToken(id, userEmail, createdAt, role, ip);
